@@ -1,0 +1,52 @@
+package com.leodou.scandhand.controller;
+
+import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.leodou.scandhand.entity.Result;
+import com.leodou.scandhand.entity.student;
+import com.leodou.scandhand.repository.StudentsRepository;
+import com.leodou.scandhand.tool.MD5Utils;
+
+
+
+@RestController
+@RequestMapping("/student")
+public class StudentsHandler {
+	@Autowired
+	private StudentsRepository studentRepository;
+	
+	@GetMapping("/findAll")
+	public List<student> findAll(){
+		return studentRepository.findAll();
+	}
+	
+	@GetMapping("/findById/{id}")
+	public student findById(@PathVariable("id")int id){
+		return studentRepository.findById(id);
+	}
+	
+	@PostMapping("/save")
+	public Result save(@RequestBody student stu) {
+		stu.setPassword(MD5Utils.md5(stu.getPassword()));
+		Result res=new Result();
+		if(findById(stu.getId()) != null) {
+			return res;
+		}
+		student result = studentRepository.save(stu);
+		if(result != null) {
+			res.setCode(1);
+			res.setMessage("success");
+		}
+			return res;
+	}
+	
+}
